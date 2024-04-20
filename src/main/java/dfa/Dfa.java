@@ -1,12 +1,13 @@
 package dfa;
 
+import javax.xml.stream.FactoryConfigurationError;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
 public class Dfa {
     private Set<State> Q = new HashSet<State>();
-    private State startState;
+    private State startState = new State("");
 
     private Set<Character> alphabet = new HashSet<Character>();
 
@@ -45,6 +46,7 @@ public class Dfa {
         if(this.containsState(startState)){
             return;
         }else {
+            this.add_state(startState);
             this.startState = startState;
         }
 
@@ -62,12 +64,68 @@ public class Dfa {
     private boolean containsState(State state){
         for (State s: Q
         ) {
-            if (state.getName() == s.getName()){
+            if (state.getName().compareTo(s.getName()) == 0){
                 return true;
             }
         }
         return false;
     }
 
+
+    public void print_dfa(){
+        System.out.println("Start state: " + this.getStartState().getName());
+
+        System.out.print("all state: ");
+        for (State s: this.getQ()
+             ) {
+            System.out.print(s.getName()+" ");
+        }
+        System.out.println();
+
+        System.out.print("final states: ");
+        for (State s: this.getQ()
+        ) {
+            if (s.isFinal()){
+                System.out.print(s.getName()+" ");
+            }
+        }
+        System.out.println();
+
+        System.out.println("Alphabet: " + this.getAlphabet());
+
+        for (Transition t: this.transitions
+             ) {
+            System.out.println("form "+t.getStartState().getName()+" to " + t.getFinalState().getName()+" with character " + t.getCharacter());
+        }
+    }
+
+    public void pre_processor(){
+        State trap = new State("Trap");
+
+        boolean trap_needed = false;
+        for (State s: this.getQ()
+        ) {
+            for (Character ch: this.alphabet
+            ) {
+                if (this.transitions.stream().noneMatch(
+                        transition -> {
+                            return transition.getStartState().getName().compareTo(s.getName()) == 0 &&
+                            transition.getCharacter().compareTo(ch) == 0;
+                        }
+                )){
+                    trap_needed = true;
+                    Transition trap_transition = new Transition(s,trap,ch);
+                    this.transitions.add(trap_transition);
+
+                }
+
+
+            }
+
+        }
+        if (trap_needed) {
+            this.getQ().add(trap);
+        }
+    }
 
 }
