@@ -1,9 +1,12 @@
 package dfa;
 
 
+import javafx.scene.shape.Circle;
+
 public class State {
     private String name;
-    private boolean isFinal;
+    private boolean isFinal = false;
+
 
     public String getName() {
         return name;
