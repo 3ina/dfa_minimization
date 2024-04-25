@@ -65,7 +65,69 @@ public class DFAMinimizer {
             }
         }
 
-        
+
+        //all tuple
+        for (State s1: dfa.getQ()
+        ) {
+            for (State s2: dfa.getQ().stream().filter(state -> state.getName().compareTo(s1.getName())!=0).collect(Collectors.toSet())
+            ) {
+
+                if(all_tuple.stream().noneMatch(tuple -> tuple.equals(new Tuple(s1,s2)))){
+                    all_tuple.add(new Tuple(s1,s2));
+                }
+
+
+            }
+
+        }
+
+        // first non merge-able tuple
+        for (State s1: dfa.getQ()
+        ) {
+
+            for (State s2: dfa.getQ().stream().filter(state -> state.getName().compareTo(s1.getName())!=0).collect(Collectors.toSet())
+            ) {
+                for (Character ch: dfa.getAlphabet()
+                ) {
+                    Optional<Transition> transition_s1 = dfa.getTransitions().stream().filter(transition -> {
+                        return transition.getStartState().getName().compareTo(s1.getName()) == 0 &&
+                                transition.getCharacter().compareTo(ch) == 0;
+                    }).findFirst();
+
+
+                    Optional<Transition> transition_s2 = dfa.getTransitions().stream().filter(transition -> {
+                        return transition.getStartState().getName().compareTo(s2.getName()) == 0 &&
+                                transition.getCharacter().compareTo(ch) == 0;
+                    }).findFirst();
+
+                    if(transition_s1.isPresent() && transition_s2.isPresent()){
+                        if (transition_s1.get().getFinalState().isFinal() != transition_s2.get().getFinalState().isFinal()){
+                            if(none_mergeable.stream().noneMatch(tuple -> tuple.equals(new Tuple(s1,s2)))){
+                                none_mergeable.add(new Tuple(s1,s2));
+
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        System.out.println("all tuple: ");
+        for (Tuple t: all_tuple
+        ) {
+            System.out.println(t.str_format);
+        }
+
+
+        System.out.println("none merge-able: ");
+        for (Tuple t: none_mergeable
+        ) {
+            System.out.println(t.str_format);
+        }
 
 
 
