@@ -1,6 +1,5 @@
 package dfa;
 
-import javax.xml.stream.FactoryConfigurationError;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -124,6 +123,11 @@ public class Dfa {
 
         }
         if (trap_needed) {
+            for (Character ch: this.alphabet
+                 ) {
+                Transition transition = new Transition(trap,trap,ch);
+
+            }
             this.getQ().add(trap);
         }
     }

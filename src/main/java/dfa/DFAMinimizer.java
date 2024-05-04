@@ -19,7 +19,7 @@ public class DFAMinimizer {
 
         int reachable_size = 1;
 
-
+        // find reachable state
         while(true){
             LinkedList<State> toAdd = new LinkedList<>();
             for (State s: reachable
@@ -54,6 +54,35 @@ public class DFAMinimizer {
                 reachable_size = reachable.size();
 
             }
+        }
+
+        // delete non reachable state
+        LinkedList<State> non_reachable = new LinkedList<State>();
+        for (State s: dfa.getQ()
+             ) {
+            if (reachable.stream().noneMatch(state -> state.getName() == s.getName())){
+                non_reachable.add(s);
+            }
+        }
+
+        for (State s: non_reachable
+             ) {
+            Optional<State> non_rech = dfa.getQ().stream().filter(state -> state.getName() == s.getName()).findFirst();
+
+            if (non_rech.isPresent()){
+                List<Transition> transition = dfa.getTransitions().stream()
+                        .filter(transition1 -> transition1.getStartState().getName() == non_rech.get().getName())
+                        .collect(Collectors.toList());
+
+                for (Transition t: transition
+                     ) {
+                    dfa.getTransitions().remove(t);
+                }
+
+                dfa.getQ().remove(non_rech.get());
+
+            }
+
         }
 
 
