@@ -1,8 +1,6 @@
 package dfa;
 
 
-import javafx.scene.shape.Circle;
-
 public class State {
     private String name;
     private boolean isFinal = false;
@@ -26,6 +24,12 @@ public class State {
 
     public State(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        State s = (State) obj;
+        return this.getName() == s.getName();
     }
 }
 

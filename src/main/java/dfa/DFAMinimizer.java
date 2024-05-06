@@ -145,6 +145,63 @@ public class DFAMinimizer {
 
         }
 
+
+
+        for (Tuple t: none_mergeable
+             ) {
+            Optional<Tuple> tupleOptional =all_tuple.stream().filter(tuple -> tuple.equals(t)).findFirst();
+            if(tupleOptional.isPresent()){
+                all_tuple.remove(tupleOptional.get());
+            }
+        }
+
+        // second non merge-able tuple
+        while (true){
+            int size = none_mergeable.size();
+            for (Tuple tuple :
+                    all_tuple) {
+
+                for (Character character:dfa.getAlphabet()
+                     ) {
+                    State state1  = dfa.getQ().stream().filter(state -> state.getName() == tuple.getS1Name()).findFirst().get();
+                    State state2  = dfa.getQ().stream().filter(state -> state.getName() == tuple.getS2Name()).findFirst().get();
+
+                    Transition transition1 = dfa.getTransitions().stream().filter(
+                            transition -> transition.getStartState().getName() == state1.getName() && transition.getCharacter() == character
+                    ).collect(Collectors.toList()).get(0);
+
+                    Transition transition2 = dfa.getTransitions().stream().filter(
+                            transition -> transition.getStartState().getName() == state2.getName() && transition.getCharacter() == character
+                    ).collect(Collectors.toList()).get(0);
+                    Tuple new_tuple = new Tuple(transition1.getFinalState(),transition2.getFinalState());
+
+                    if (none_mergeable.stream().anyMatch(tuple1 ->
+                            tuple1.equals(new_tuple))){
+                            none_mergeable.add(tuple);
+
+                    }
+
+                }
+            }
+
+            if (size == none_mergeable.size()){
+                break;
+            }else {
+                size = none_mergeable.size();
+            }
+        }
+
+
+
+        for (Tuple t: none_mergeable
+        ) {
+            Optional<Tuple> tupleOptional =all_tuple.stream().filter(tuple -> tuple.equals(t)).findFirst();
+            if(tupleOptional.isPresent()){
+                all_tuple.remove(tupleOptional.get());
+            }
+        }
+
+
         System.out.println("all tuple: ");
         for (Tuple t: all_tuple
         ) {
@@ -158,6 +215,44 @@ public class DFAMinimizer {
             System.out.println(t.str_format);
         }
 
+        //merge states
+
+        for (Tuple t: all_tuple
+             ) {
+            String s1_name = t.getS1Name();
+            String s2_name = t.getS2Name();
+
+
+            Optional<State> s1 = dfa.getQ().stream().filter(state -> state.getName() == s1_name).findFirst();
+            if(s1.isPresent()){
+                State state_1 = s1.get();
+
+                Optional<State> s2 = dfa.getQ().stream().filter(state -> state.getName() == s2_name).findFirst();
+                if (s2.isPresent()){
+                    State state_2 = s2.get();
+
+                    for (Transition transition: dfa.getTransitions()
+                         ) {
+                        if (transition.getStartState().getName() == state_1.getName()){
+                            transition.setStartState(state_2);
+                        }
+                        if (transition.getFinalState().getName() == state_1.getName()){
+                            transition.setFinalState(state_2);
+                        }
+                    }
+                    if(state_1.isFinal()){
+                        state_2.setFinal(true);
+                    }
+                    if (dfa.getStartState().getName() == state_1.getName()){
+                        dfa.setStartState(state_2);
+                    }
+                    dfa.getQ().remove(state_1);
+                }
+            }
+
+
+
+        }
 
 
 

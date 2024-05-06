@@ -12,6 +12,7 @@ public class Tuple {
         this.s2 = s2;
         this.str_format = "{"+this.s1.getName()+this.s2.getName()+"}";
         this.str_format_reverse = "{"+this.s2.getName()+this.s1.getName()+"}";
+
     }
 
     @Override
@@ -23,5 +24,13 @@ public class Tuple {
 
         return false;
 
+    }
+
+    public String getS1Name() {
+        return s1.getName();
+    }
+
+    public String getS2Name() {
+        return s2.getName();
     }
 }

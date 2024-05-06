@@ -103,8 +103,11 @@ public class Main {
             }
 
             dfa.pre_processor();
-            dfa.print_dfa();
+
 
             DFAMinimizer.minimize(dfa);
+
+            dfa.print_dfa();
+
         }
 }
