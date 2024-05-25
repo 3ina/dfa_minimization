@@ -1,6 +1,8 @@
 package dfa;
 
 
+import java.util.Objects;
+
 public class State {
     private String name;
     private boolean isFinal = false;
@@ -29,7 +31,7 @@ public class State {
     @Override
     public boolean equals(Object obj) {
         State s = (State) obj;
-        return this.getName() == s.getName();
+        return Objects.equals(this.name, s.name);
     }
 }
 

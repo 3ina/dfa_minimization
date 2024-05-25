@@ -1,8 +1,6 @@
 package dfa;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 public class Dfa {
     private Set<State> Q = new HashSet<State>();
@@ -91,10 +89,19 @@ public class Dfa {
         System.out.println();
 
         System.out.println("Alphabet: " + this.getAlphabet());
-
+        List<String> transitions_to_print_dfa = new ArrayList<String>();
         for (Transition t: this.transitions
              ) {
-            System.out.println("form "+t.getStartState().getName()+" to " + t.getFinalState().getName()+" with character " + t.getCharacter());
+            String s = "form "+t.getStartState().getName()+" to " + t.getFinalState().getName()+" with character " + t.getCharacter();
+            if(transitions_to_print_dfa.contains(s)){
+                continue;
+            }else {
+                transitions_to_print_dfa.add(s);
+            }
+        }
+
+        for (String s: transitions_to_print_dfa){
+            System.out.println(s);
         }
     }
 

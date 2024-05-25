@@ -5,13 +5,13 @@ import java.util.stream.Collectors;
 
 public class DFAMinimizer {
 
-    private static LinkedList<Tuple> none_mergeable = new LinkedList<>();
-    private  static  LinkedList<Tuple> all_tuple = new LinkedList<>();
+    private static final LinkedList<Tuple> none_mergeable = new LinkedList<>();
+    private  static final LinkedList<Tuple> all_tuple = new LinkedList<>();
 
-    private  static LinkedList<State> reachable = new LinkedList<>();
+    private  static final LinkedList<State> reachable = new LinkedList<>();
 
 
-    public static Dfa minimize(Dfa dfa) {
+    public static void minimize(Dfa dfa) {
 
         State start_state = dfa.getStartState();
         reachable.add(start_state);
@@ -250,13 +250,27 @@ public class DFAMinimizer {
                 }
             }
 
-
-
         }
 
+        HashMap<String,Integer> duplicate = new HashMap<>();
+        for (Transition t: dfa.getTransitions()
+             ) {
+
+            if (!duplicate.containsKey(t.getStringformat())){
+                duplicate.put(t.getStringformat(),1);
+            }else {
+                duplicate.put(t.getStringformat(),duplicate.get(t.getStringformat())+1);
+            }
+        }
+
+        duplicate.forEach((s, integer) ->{
+            System.out.println(s+ " : " + integer);
+        });
 
 
-      return dfa;
+
+
+
     }
 
 

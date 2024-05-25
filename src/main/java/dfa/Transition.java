@@ -1,5 +1,7 @@
 package dfa;
 
+import java.util.Objects;
+
 public class Transition {
     private State startState;
     private State finalState;
@@ -45,7 +47,12 @@ public class Transition {
     @Override
     public boolean equals(Object obj) {
         return this.startState == ((Transition) obj).startState &&
-                this.startState == ((Transition) obj).startState &&
+                this.finalState == ((Transition) obj).finalState &&
                 this.character == ((Transition) obj).character;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startState, finalState, character);
     }
 }
