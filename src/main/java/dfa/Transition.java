@@ -6,18 +6,17 @@ public class Transition {
     private State startState;
     private State finalState;
     private Character character;
-
-    private String stringformat;
-
-    public String getStringformat() {
-        return stringformat;
-    }
+    private final String stringformat;
 
     public Transition(State startState, State finalState, Character character) {
         this.startState = startState;
         this.finalState = finalState;
         this.character = character;
-        this.stringformat = startState.getName()+","+character.toString()+","+finalState.getName();
+        this.stringformat = startState.getName() + "," + character + "," + finalState.getName();
+    }
+
+    public String getStringformat() {
+        return stringformat;
     }
 
     public State getFinalState() {
@@ -46,9 +45,12 @@ public class Transition {
 
     @Override
     public boolean equals(Object obj) {
-        return this.startState == ((Transition) obj).startState &&
-                this.finalState == ((Transition) obj).finalState &&
-                this.character == ((Transition) obj).character;
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Transition that = (Transition) obj;
+        return Objects.equals(startState, that.startState) &&
+                Objects.equals(finalState, that.finalState) &&
+                Objects.equals(character, that.character);
     }
 
     @Override

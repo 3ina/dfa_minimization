@@ -3,23 +3,19 @@ package dfa;
 import java.util.*;
 
 public class Dfa {
-    private Set<State> Q = new HashSet<State>();
+    private Set<State> Q = new HashSet<>();
     private State startState = new State("");
+    private Set<Character> alphabet = new HashSet<>();
+    private List<Transition> transitions = new ArrayList<>();
 
-    private Set<Character> alphabet = new HashSet<Character>();
-
-
-    private LinkedList<Transition> transitions = new LinkedList<Transition>();
-
-    public LinkedList<Transition> getTransitions() {
+    public List<Transition> getTransitions() {
         return transitions;
     }
 
-    public void setTransition(State startState,State finalState , Character character) {
-        if(alphabet.contains(character) && Q.contains(startState) && Q.contains(finalState)){
-            Transition transition = new Transition(startState,finalState,character);
-            this.transitions.add(transition);
-
+    public void setTransition(State startState, State finalState, Character character) {
+        if (alphabet.contains(character) && Q.contains(startState) && Q.contains(finalState)) {
+            Transition transition = new Transition(startState, finalState, character);
+            transitions.add(transition);
         }
     }
 
@@ -27,8 +23,8 @@ public class Dfa {
         return alphabet;
     }
 
-    public void setAlphabet(Character character) {
-        this.alphabet.add(character);
+    public void addAlphabet(Character character) {
+        alphabet.add(character);
     }
 
     public Set<State> getQ() {
@@ -40,103 +36,66 @@ public class Dfa {
     }
 
     public void setStartState(State startState) {
-        if(this.containsState(startState)){
-            return;
-        }else {
-            this.add_state(startState);
-            this.startState = startState;
+        if (!containsState(startState)) {
+            addState(startState);
         }
+        this.startState = startState;
 
     }
 
-    public void add_state(State state){
-        if (this.containsState(state)){
-            return;
-        }else {
+    public void addState(State state) {
+        if (!containsState(state)) {
             Q.add(state);
-
         }
     }
 
-    private boolean containsState(State state){
-        for (State s: Q
-        ) {
-            if (state.getName().compareTo(s.getName()) == 0){
-                return true;
-            }
-        }
-        return false;
+    private boolean containsState(State state) {
+        return Q.stream().anyMatch(s -> s.getName().equals(state.getName()));
     }
 
+    public void printDfa() {
+        System.out.println("Start state: " + startState.getName());
 
-    public void print_dfa(){
-        System.out.println("Start state: " + this.getStartState().getName());
-
-        System.out.print("all state: ");
-        for (State s: this.getQ()
-             ) {
-            System.out.print(s.getName()+" ");
-        }
+        System.out.print("All states: ");
+        Q.forEach(s -> System.out.print(s.getName() + " "));
         System.out.println();
 
-        System.out.print("final states: ");
-        for (State s: this.getQ()
-        ) {
-            if (s.isFinal()){
-                System.out.print(s.getName()+" ");
-            }
-        }
+        System.out.print("Final states: ");
+        Q.stream().filter(State::isFinal).forEach(s -> System.out.print(s.getName() + " "));
         System.out.println();
 
-        System.out.println("Alphabet: " + this.getAlphabet());
-        List<String> transitions_to_print_dfa = new ArrayList<String>();
-        for (Transition t: this.transitions
-             ) {
-            String s = "form "+t.getStartState().getName()+" to " + t.getFinalState().getName()+" with character " + t.getCharacter();
-            if(transitions_to_print_dfa.contains(s)){
-                continue;
-            }else {
-                transitions_to_print_dfa.add(s);
-            }
+        System.out.println("Alphabet: " + alphabet);
+
+        Set<String> transitionsToPrint = new HashSet<>();
+        for (Transition t : transitions) {
+            String s = "from " + t.getStartState().getName() + " to " + t.getFinalState().getName() + " with character " + t.getCharacter();
+            transitionsToPrint.add(s);
         }
 
-        for (String s: transitions_to_print_dfa){
-            System.out.println(s);
-        }
+        transitionsToPrint.forEach(System.out::println);
     }
 
-    public void pre_processor(){
+    public void preProcessor() {
         State trap = new State("Trap");
+        boolean trapNeeded = false;
 
-        boolean trap_needed = false;
-        for (State s: this.getQ()
-        ) {
-            for (Character ch: this.alphabet
-            ) {
-                if (this.transitions.stream().noneMatch(
-                        transition -> {
-                            return transition.getStartState().getName().compareTo(s.getName()) == 0 &&
-                            transition.getCharacter().compareTo(ch) == 0;
-                        }
-                )){
-                    trap_needed = true;
-                    Transition trap_transition = new Transition(s,trap,ch);
-                    this.transitions.add(trap_transition);
+        for (State s : Q) {
+            for (Character ch : alphabet) {
+                boolean transitionExists = transitions.stream()
+                        .anyMatch(t -> t.getStartState().equals(s) && t.getCharacter().equals(ch));
 
+                if (!transitionExists) {
+                    trapNeeded = true;
+                    transitions.add(new Transition(s, trap, ch));
                 }
-
-
             }
-
         }
-        if (trap_needed) {
-            for (Character ch: this.alphabet
-                 ) {
-                Transition transition = new Transition(trap,trap,ch);
 
+        if (trapNeeded) {
+            for (Character ch : alphabet) {
+                transitions.add(new Transition(trap, trap, ch));
             }
-            this.getQ().add(trap);
+            Q.add(trap);
         }
     }
-
 }

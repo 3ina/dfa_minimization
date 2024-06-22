@@ -4,110 +4,106 @@ import java.util.Scanner;
 
 public class Main {
 
-        public static void main(String[] args) {
-            Scanner scanner = new Scanner(System.in);
-            Dfa dfa = new Dfa();
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Dfa dfa = new Dfa();
 
-            System.out.print("Enter the number of states: ");
-            int numberOfStates = scanner.nextInt();
+        System.out.print("Enter the number of states: ");
+        int numberOfStates = scanner.nextInt();
+        scanner.nextLine();  // Consume newline
 
-            scanner.nextLine();
+        System.out.print("Enter the start state: ");
+        String startStateName = scanner.nextLine().trim();
+        State startState = createAndAddState(scanner, dfa, startStateName);
 
-            System.out.print("Enter the start state: ");
-            String start_state_name = scanner.nextLine().trim();
-            System.out.print("final?(y/n): ");
-            String is_final = scanner.nextLine().trim().toLowerCase();
+        dfa.setStartState(startState);
 
-            State start_state = new State(start_state_name);
-
-            if (is_final.compareTo("y") == 0){
-                start_state.setFinal(true);
+        for (int i = 1; i < numberOfStates; i++) { // Start from 1 as the first state is already added
+            System.out.print("Enter state name " + (i + 1) + ": ");
+            String stateName = scanner.nextLine().trim();
+            if (dfa.getQ().stream().noneMatch(state -> state.getName().equals(stateName))) {
+                createAndAddState(scanner, dfa, stateName);
+            } else {
+                System.out.println("This state already exists.");
+                return;
             }
-
-
-            dfa.setStartState(start_state);
-
-            for (int i = 2; i <=numberOfStates; i++) {
-                System.out.print("Enter the start state"+i+": ");
-                String state_name = scanner.nextLine().trim();
-                if (dfa.getQ().stream().noneMatch(state -> state.getName().compareTo(state_name) == 0)){
-                    System.out.print("final?(y/n): ");
-                    is_final = scanner.nextLine().trim().toLowerCase();
-                    State new_state = new State(state_name);
-                    if (is_final.compareTo("y") == 0){
-                        new_state.setFinal(true);
-                    }
-                    dfa.add_state(new_state);
-                }else {
-                    System.out.println("this state exists already");
-                    System.exit(0);
-
-                }
-            }
-
-
-            System.out.print("Enter the size of alphabet: ");
-            int alphabetSize = scanner.nextInt();
-
-            scanner.nextLine();
-
-
-            for (int i = 0; i < alphabetSize; i++) {
-                System.out.print("Enter alphabet character " + (i + 1) + ": ");
-                char character = scanner.nextLine().charAt(0);
-                dfa.setAlphabet(character);
-            }
-
-
-            System.out.print("Enter the number of transitions: ");
-            int transitions_size = scanner.nextInt();
-            System.out.println("inter your transition in this format : q0,a,q1");
-            scanner.nextLine();
-            for (int i = 0; i <Math.min(transitions_size,Math.pow(dfa.getAlphabet().size(),dfa.getQ().size())); i++) {
-
-                System.out.println("inter transition"+(i+1)+": ");
-                String[] transitions = scanner.nextLine().trim().split(",");
-
-                String start_state_name_t = transitions[0];
-                if(dfa.getQ().stream().noneMatch(state -> state.getName().compareTo(start_state_name_t) == 0)){
-                    System.out.println("this state does not exists");
-                    System.exit(0);
-                }
-
-                Character character =  transitions[1].toCharArray()[0];
-                if (dfa.getAlphabet().stream().noneMatch(character1 -> character.compareTo(character) == 0)){
-                    System.out.println("this character not in dfa alphabet");
-                    System.exit(0);
-                }
-
-                String final_state_name_t = transitions[2];
-                if(dfa.getQ().stream().noneMatch(state -> state.getName().compareTo(final_state_name_t) == 0)){
-                    System.out.println("this state does not exists");
-                    System.exit(0);
-                }
-
-
-
-
-                State start_state_t = dfa.getQ().stream().filter(state -> state.getName().compareTo(start_state_name_t) == 0).findAny().get();
-                State final_state_t = dfa.getQ().stream().filter(state -> state.getName().compareTo(final_state_name_t) == 0).findAny().get();
-
-                Transition transition = new Transition(start_state_t,final_state_t,character);
-
-                if (dfa.getTransitions().stream().anyMatch(transition1 -> transition1.equals(transition))){
-                    System.out.println("this transition already exists");
-                    System.exit(0);
-                }
-                dfa.setTransition(start_state_t,final_state_t,character);
-
-            }
-
-            dfa.pre_processor();
-
-
-            DFAMinimizer.minimize(dfa);
-
-            dfa.print_dfa();
-
         }
+
+        System.out.print("Enter the size of the alphabet: ");
+        int alphabetSize = scanner.nextInt();
+        scanner.nextLine();  // Consume newline
+
+        for (int i = 0; i < alphabetSize; i++) {
+            System.out.print("Enter alphabet character " + (i + 1) + ": ");
+            char character = scanner.nextLine().charAt(0);
+            dfa.addAlphabet(character);
+        }
+
+        System.out.print("Enter the number of transitions: ");
+        int transitionsSize = scanner.nextInt();
+        System.out.println("Enter your transitions in this format: q0,a,q1");
+        scanner.nextLine();  // Consume newline
+
+        for (int i = 0; i < transitionsSize; i++) {
+            System.out.print("Enter transition " + (i + 1) + ": ");
+            String[] transitionData = scanner.nextLine().trim().split(",");
+
+            if (transitionData.length != 3) {
+                System.out.println("Invalid transition format.");
+                return;
+            }
+
+            String startStateNameT = transitionData[0];
+            char character = transitionData[1].charAt(0);
+            String finalStateNameT = transitionData[2];
+
+            if (!stateExists(dfa, startStateNameT) || !stateExists(dfa, finalStateNameT)) {
+                System.out.println("One of the states does not exist.");
+                return;
+            }
+
+            if (!alphabetContainsCharacter(dfa, character)) {
+                System.out.println("This character is not in the DFA alphabet.");
+                return;
+            }
+
+            State startStateT = getStateByName(dfa, startStateNameT);
+            State finalStateT = getStateByName(dfa, finalStateNameT);
+            Transition transition = new Transition(startStateT, finalStateT, character);
+
+            if (dfa.getTransitions().stream().anyMatch(t -> t.equals(transition))) {
+                System.out.println("This transition already exists.");
+                return;
+            }
+
+            dfa.setTransition(startStateT, finalStateT, character);
+        }
+
+        dfa.preProcessor();
+        DFAMinimizer.minimize(dfa);
+        dfa.printDfa();
+    }
+
+    private static State createAndAddState(Scanner scanner, Dfa dfa, String stateName) {
+        System.out.print("Final state? (y/n): ");
+        String isFinal = scanner.nextLine().trim().toLowerCase();
+        State state = new State(stateName);
+        if (isFinal.equals("y")) {
+            state.setFinal(true);
+        }
+        dfa.addState(state);
+        return state;
+    }
+
+    private static boolean stateExists(Dfa dfa, String stateName) {
+        return dfa.getQ().stream().anyMatch(state -> state.getName().equals(stateName));
+    }
+
+    private static boolean alphabetContainsCharacter(Dfa dfa, char character) {
+        return dfa.getAlphabet().contains(character);
+    }
+
+    private static State getStateByName(Dfa dfa, String stateName) {
+        return dfa.getQ().stream().filter(state -> state.getName().equals(stateName)).findFirst().orElse(null);
+    }
 }
