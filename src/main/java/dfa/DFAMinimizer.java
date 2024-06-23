@@ -165,7 +165,9 @@ public class DFAMinimizer {
         for (Tuple t : allTuples) {
             State s1 = getStateByName(dfa, t.getS1Name());
             State s2 = getStateByName(dfa, t.getS2Name());
-
+            if (s1 == null || s2 == null){
+                continue;
+            }
             for (Transition transition : dfa.getTransitions()) {
                 if (Objects.equals(transition.getStartState().getName(), s1.getName())) {
                     transition.setStartState(s2);

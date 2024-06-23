@@ -10,7 +10,7 @@ public class Main {
 
         System.out.print("Enter the number of states: ");
         int numberOfStates = scanner.nextInt();
-        scanner.nextLine();  // Consume newline
+        scanner.nextLine();
 
         System.out.print("Enter the start state: ");
         String startStateName = scanner.nextLine().trim();
@@ -18,7 +18,7 @@ public class Main {
 
         dfa.setStartState(startState);
 
-        for (int i = 1; i < numberOfStates; i++) { // Start from 1 as the first state is already added
+        for (int i = 1; i < numberOfStates; i++) {
             System.out.print("Enter state name " + (i + 1) + ": ");
             String stateName = scanner.nextLine().trim();
             if (dfa.getQ().stream().noneMatch(state -> state.getName().equals(stateName))) {
@@ -31,8 +31,7 @@ public class Main {
 
         System.out.print("Enter the size of the alphabet: ");
         int alphabetSize = scanner.nextInt();
-        scanner.nextLine();  // Consume newline
-
+        scanner.nextLine();
         for (int i = 0; i < alphabetSize; i++) {
             System.out.print("Enter alphabet character " + (i + 1) + ": ");
             char character = scanner.nextLine().charAt(0);
@@ -42,7 +41,7 @@ public class Main {
         System.out.print("Enter the number of transitions: ");
         int transitionsSize = scanner.nextInt();
         System.out.println("Enter your transitions in this format: q0,a,q1");
-        scanner.nextLine();  // Consume newline
+        scanner.nextLine();
 
         for (int i = 0; i < transitionsSize; i++) {
             System.out.print("Enter transition " + (i + 1) + ": ");
